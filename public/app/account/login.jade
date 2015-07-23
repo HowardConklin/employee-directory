@@ -12,8 +12,8 @@ div(ng-show="vm.identity.isAuthenticated()")
 
   ul(ng-if="vm.identity.currentUser.isAdmin()")
     li
-      a(href="/admin/users") User Admin
+      a(ui-sref="admin.users") User Admin
     li
-      a(href="/admin/create-user") Create User
+      a(ui-sref="admin.create-user") Create User
     li
-      a(href="/admin/update-user") Update User
+      a(ui-sref="admin.update-user") Update User

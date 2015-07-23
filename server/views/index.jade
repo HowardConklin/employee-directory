@@ -9,8 +9,8 @@ block main-content
       div(ng-include="'partials/components/employee-selector'")
   section.page-content-wrapper
     header.topbar
-      a(href="/") Home
-      span /
-      a(href="/seat-map") Seat Map
+      a(ui-sref="home") Home
+      span  / 
+      a(ui-sref="seat-map") Seat Map
     div.container-fluid.page-content
-      div(ng-view)
+      div(ui-view)

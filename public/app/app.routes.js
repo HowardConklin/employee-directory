@@ -1,70 +1,74 @@
 (function () {
-  'use strict';
-  angular.module('app').config(configure);
+    'use strict';
 
-  configure.$inject = ['$routeProvider', '$locationProvider'];
+    var routerApp = angular.module('app', ['ui.router', 'ngResource']);
 
-  function configure($routeProvider, $locationProvider) {
     var routeRoleChecks = {
-      admin: requireAdmin,
-      user: requireAuth
+        admin: requireAdmin,
+        user: requireAuth
     };
 
-    $locationProvider.html5Mode(true);
-    $routeProvider
-      .when('/', {
-        templateUrl: '/partials/main/main',
-        controller: 'edMainCtrl',
-        controllerAs: 'vm'
-      })
-      .when('/seat-map/:pos?', {
-        templateUrl: '/partials/seat-map/seat-map',
-        controller: 'edSeatMapCtrl',
-        controllerAs: 'vm'
-      })
-      .when('/login', {
-        templateUrl: '/partials/account/login',
-        controller: 'edLoginCtrl',
-        controllerAs: 'vm'
-      })
-      .when('/admin/users', {
-        templateUrl: '/partials/admin/user-list',
-        controller: 'edUserListCtrl',
-        controllerAs: 'vm',
-        resolve: {
-          auth: routeRoleChecks.admin
-        }
-      })
-      .when('/admin/create-user', {
-        templateUrl: '/partials/admin/create-user',
-        controller: 'edCreateUserCtrl',
-        controllerAs: 'vm',
-        resolve: {
-          auth: routeRoleChecks.admin
-        }
-      })
-      .when('/admin/update-user', {
-        templateUrl: '/partials/admin/update-user',
-        controller: 'edUpdateUserCtrl',
-        controllerAs: 'vm',
-        resolve: {
-          auth: routeRoleChecks.user
-        }
-      })
-      .otherwise({
-        redirectTo: '/'
-      });
-  }
+    routerApp.config(['$stateProvider', '$urlRouterProvider', '$locationProvider', function($stateProvider, $urlRouterProvider, $locationProvider) {
+        // for any unmatched url
+        $urlRouterProvider.otherwise("/");
 
-  requireAdmin.$inject = ['edAuthService'];
+        $locationProvider.html5Mode(true);
 
-  function requireAdmin(edAuthService) {
-    return edAuthService.authorizeCurrentUserForRoute('admin');
-  }
+        $stateProvider
+        .state('home', {
+            url: '/',
+            templateUrl: '/partials/main/main',
+            controller: 'edMainCtrl as vm',
+        })
+        .state('seat-map', {
+            url: '/seat-map/:pos',
+            templateUrl: '/partials/seat-map/seat-map',
+            controller: 'edSeatMapCtrl as vm'
+        })
+        .state('login', {
+            url: '/login',
+            templateUrl: '/partials/account/login',
+            controller: 'edLoginCtrl as vm'
+        })
+        .state('admin', {
+            url: '/admin',
+            template: '<div ui-view></div>',
+        })
+        .state('admin.users', {
+            url: '/users',
+            templateUrl: '/partials/admin/user-list',
+            controller: 'edUserListCtrl as vm',
+            resolve: {
+                auth: routeRoleChecks.admin
+            }
+        })
+        .state('admin.create-user', {
+            url: '/create-user',
+            templateUrl: '/partials/admin/create-user',
+            controller: 'edCreateUserCtrl as vm',
+            resolve: {
+                auth: routeRoleChecks.admin
+            }
+        })
+        .state('admin.update-user', {
+            url: '/update-user',
+            templateUrl: '/partials/admin/update-user',
+            controller: 'edUpdateUserCtrl as vm',
+            resolve: {
+                auth: routeRoleChecks.user
+            }
+        });
+    }]);
+   
+    requireAdmin.$inject = ['edAuthService'];
 
-  requireAuth.$inject = ['edAuthService'];
+    function requireAdmin(edAuthService) {
+        return edAuthService.authorizeCurrentUserForRoute('admin');
+    }
 
-  function requireAuth(edAuthService) {
-    return edAuthService.authorizeAuthenticatedUserForRoute();
-  }
+    requireAuth.$inject = ['edAuthService'];
+
+    function requireAuth(edAuthService) {
+        return edAuthService.authorizeAuthenticatedUserForRoute();
+    }
 })();
